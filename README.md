@@ -217,3 +217,60 @@ Uses asynchronous I/O exclusively.
       await zset.RemoveRangeByValue("two");
 
       // Union and intersect
+      
+## RedisHash
+
+     // 1 - As a dictionary
+
+      var key1 = _container.GetKey<RedisHash<string, int>>("key1");
+
+      // Set
+      await key1.Set("0", 0);
+      var list = new List<KeyValuePair<string, int>>();
+      for (int i = 1; i <= 10; i++) list.Add(new KeyValuePair<string, int>(i.ToString(), i));
+      await key1.SetRange(list);
+
+      // Misc
+      await key1.Decrement("1");
+      await key1.Increment("0");
+
+      var ct = await key1.Count();
+      var has = await key1.ContainsKey("2");
+
+      var keys = await key1.Keys();
+      var values = await key1.Values();
+      var items = await key1.ToList();
+
+      // get 
+      var f1 = await key1.Get("2");
+      var f2 = await key1.GetRange(new[] { "1", "5" });
+      
+      // Remove
+      await key1.Remove("0");
+      await key1.RemoveRange(new[] { "1", "2" });
+ 
+      // Enumerate
+      await foreach (var item in key1) Console.WriteLine($"{item.Key} - {item.Value}");
+
+      //
+      // 2 - As a DTO
+      //
+      var custKey = _container.GetKey<RedisDtoHash<Customer>>("cust:1");
+
+      var cust1 = new Customer { Id = 1, Name = "safeway" };
+      await custKey.FromDto(cust1);
+
+      var cust1copy = await custKey.ToDto();
+      
+      //  
+      // 3 - As untyped hash table
+      // 
+      var item1 = _container.GetKey<RedisValueHash>("key3");
+
+      await item1.Set("title", "goto statement considered harmful");
+      await item1.Set("link", "http:go.com");
+      await item1.Set("poster", "user:123");
+      await item1.Set("time", DateTime.Now.Ticks);
+      await item1.Set("votes", 122);
+
+      await foreach (var field in item1) Console.WriteLine($"{field.Key} = {field.Value}");
