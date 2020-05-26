@@ -1,7 +1,7 @@
 # RedisProvider
 .NET Redis container and strongly typed data objects
 
-Strongly-typed data objects encapsulate the commands specific to the common data types:
+Strongly-typed data objects encapsulate the commands specific to the common [data types](https://redis.io/topics/data-types-intro):
 | Class | Redis data type |
 | ----  | ----|
 | RedisItem&lt;T> | "string" |
@@ -13,8 +13,9 @@ Strongly-typed data objects encapsulate the commands specific to the common data
 | RedisDtoHash&lt;T> | maps a hash to a DTO |
 | RedisObject | Base class for all key types |
 
-The **RedisContainer** can track RedisObjects, and optionally provide a namespace for all keys.
+The **RedisContainer** provides a key namespace and allows for an intutive model of the Redis keys used within an application.  The container optionally keeps track of keys used, but does not cache any data.
 
+The strongly-typed objects do not hold state, but instead provide wrappers around the Redis commands allowed for the key's data type.    
 Uses asynchronous I/O exclusively.
 
 # Usage
@@ -25,7 +26,7 @@ Uses asynchronous I/O exclusively.
     var cn = new RedisConnection("127.0.0.1:6379,abortConnect=false");
     var container = new RedisContainer(cn, "test");
 
-    // Keys are managed by the container.
+    // Keys are managed by the container.  The key may already exist in the db.  Or not. 
     var key1 = container.GetKey<RedisItem<string>>("key1");
     await key1.Set("Hello world");
     // key1.KeyName is "test:key1"
@@ -142,3 +143,37 @@ Uses asynchronous I/O exclusively.
 
       var list3 = _container.GetKey<RedisList<short>>("destlist3");
       await numbers.PopPush(list3);
+
+## RedisSet
+
+      var set1 = _container.GetKey<RedisSet<string>>("set1");
+
+      // Add 
+      await set1.Add("a");
+      await set1.AddRange(new[] { "b", "c", "d", "e" });
+      var has2 = await set1.Contains("2");
+      var ct = await set1.Count();
+      var allItems = await set1.ToList();
+
+      // Enumerate
+      await foreach (var i in set1) Console.Write(i);
+
+      // Peek and pop
+      var el1 = await set1.Peek();
+      var el2 = await set1.Pop();
+
+      // Remove
+      await set1.Remove("b");
+      await set1.RemoveRange(new[] { "c", "d" });
+
+      // Set operators 
+
+      var set2 = _container.GetKey<RedisSet<string>>("set2");
+      await set2.AddRange(new[] { "a", "b", "c" });
+
+      var differ = await set2.Difference(set1);
+      var inter = await set1.Intersect(set2);
+      var sort = await set2.Sort(Order.Descending, SortType.Alphabetic);
+
+      var destSet = _container.GetKey<RedisSet<string>>("set3");
+      await set1.UnionStore(destSet, set2);
