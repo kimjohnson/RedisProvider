@@ -261,15 +261,15 @@ StackExchange.Redis dependency.
       //
       var custKey = _container.GetKey<RedisDtoHash<Customer>>("cust:1");
 
-      var cust1 = new Customer { Id = 1, Name = "safeway" };
+      var cust1 = new Customer { Id = 1, Name = "Safeway" };
       await custKey.FromDto(cust1);
-
-      var cust1copy = await custKey.ToDto();
+      await custKey.Set("name", "CVS");
+      var cust1Alt = await custKey.ToDto();
       
       //  
       // 3 - As untyped key-value pair hash
       // 
-      var item1 = _container.GetKey<RedisValueHash>("key3");
+      var item1 = _container.GetKey<RedisValueHash>("post:1");
 
       await item1.Set("title", "goto statement considered harmful");
       await item1.Set("link", "http:go.com");
