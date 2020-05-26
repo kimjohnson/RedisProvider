@@ -177,3 +177,43 @@ Uses asynchronous I/O exclusively.
 
       var destSet = _container.GetKey<RedisSet<string>>("set3");
       await set1.UnionStore(destSet, set2);
+
+## RedisSortedSet
+
+      var zset = _container.GetKey<RedisSortedSet<string>>("key1");
+
+      // Add
+      await zset.Add("one", 1);
+      await zset.Add("uno", 1);
+      await zset.AddRange(new[] { (element: "two", score: 2.0), (element: "three", score: 3.0) });
+
+      // Count
+      var ct1 = await zset.Count();
+      var ct2 = await zset.CountByScore(0, 1);
+      var ct3 = await zset.CountByValue("ta", "zz");
+
+      // Range
+      var r1 = await zset.Range();
+      var r2 = await zset.RangeByScore(0, 1);
+      var r3 = await zset.RangeByValue("ta", "zz");
+      var r4 = await zset.RangeWithScores(0, 1);
+
+      // Enumerate
+      await foreach (var item in zset) Console.WriteLine(item);
+
+      // Misc
+      var news1 = await zset.IncrementScore("three", 1);
+      var rk = await zset.Rank("three");
+      var s = await zset.Score("uno");
+      //var el0 = await zset.Pop();
+
+      // Sort
+      var list = await zset.Sort(Order.Ascending, SortType.Alphabetic);
+
+      // Remove
+      await zset.Remove("one");
+      await zset.RemoveRange(0, 0);
+      await zset.RemoveRangeByScore(3);
+      await zset.RemoveRangeByValue("two");
+
+      // Union and intersect
