@@ -15,8 +15,11 @@ Strongly-typed data objects encapsulate the commands specific to the common [dat
 
 The **RedisContainer** provides a key namespace and allows for an intutive model of the Redis keys used within an application.  The container optionally keeps track of keys used, but does not cache any data.
 
-The strongly-typed objects do not hold state, but instead provide wrappers around the Redis commands allowed for the key's data type.    
+The strongly-typed objects do not hold state, but instead provide wrappers around only the Redis commands allowed for the key's data type.    
+
 Uses asynchronous I/O exclusively.
+
+StackExchange.Redis dependency.
 
 # Usage
 
@@ -282,11 +285,11 @@ Uses asynchronous I/O exclusively.
       var itemkey1 = _container.GetKey<RedisItem<string>>("key1");
 
       // Create a new object and add to the container.  This also does not create the key in the Redis database.
+      
       var itemkey2 = _container.AddToContainer(new RedisItem<string>("key2"));
-      await itemkey2.Set("world");
 
       // Templated key creation with KeyTemplate<T>
-      // If using the common pattern of including the object ID in the key name, for example "user:1", "user:1234", 
+      // If using the common pattern of including the object ID in the key name, for example "user:1" or "user:1234", 
       // manually creating each key and ensuring both the data type and key name format are correct can be error prone.  
       // The KeyTemplate<T> acts as a factory for keys of the specified type and key name pattern.
       
@@ -300,4 +303,29 @@ Uses asynchronous I/O exclusively.
       foreach (var k in _container.TrackedKeys) Console.WriteLine(k);
       
 ## Transactions and batches
+Transactions and batches allow a group of commands to be sent to the Redis server as a unit and processed as a unit.  The commands
+in a batch may not be processed in order.  Note that there is no concept of commit/rollback.  You must check the Task.Result of 
+individual commands after execution for returned values.
+
+      // A simple batch
+      var key1 = _container.GetKey<RedisSet<string>>("key1");
+      var batch = _container.CreateBatch();
+      key1.WithBatch(batch).Add("a");
+      key1.WithBatch(batch).Add("b");
+      await batch.Execute();
+
+      // A simple transaction
+      var keyA = _container.GetKey<RedisItem<string>>("keya");
+      var keyB = _container.GetKey<RedisItem<string>>("keyb");
+
+      await keyA.Set("abc");
+      await keyB.Set("def");
+
+      var tx = _container.CreateTransaction();
+      var t1 = keyA.WithTx(tx).Get();
+      var t2 = keyB.WithTx(tx).Get();
+      await tx.Execute();
+      var a = t1.Result;
+      var b = t2.Result;
+
 
