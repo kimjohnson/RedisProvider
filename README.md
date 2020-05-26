@@ -109,4 +109,36 @@ Uses asynchronous I/O exclusively.
   
   ## RedisList
   
-  
+      var numbers = _container.GetKey<RedisList<short>>("numbers");
+
+      // Add 
+      await numbers.AddFirst(1);
+      await numbers.AddLast(5, 10, 15);
+      await numbers.AddAfter(1, 3);
+      await numbers.AddBefore(15, 12);
+
+      // Access by index
+      var ct = await numbers.Count();
+      var i2 = await numbers.Index(2);
+      var i0 = await numbers.First();
+      var ix = await numbers.Last();
+      await numbers.Set(0, 2);
+
+      // Remove
+      await numbers.RemoveFirst();
+      await numbers.RemoveLast();
+      await numbers.Remove(10);
+
+      // Enumerate
+      await foreach (var i in numbers) Console.Write(i);
+
+      // Misc
+      var sorted = await numbers.Sort(Order.Descending);
+      var n3 = await numbers.Range(0, -1);
+      await numbers.Trim(1, -1);
+
+      var list2 = _container.GetKey<RedisList<short>>("destlist2");
+      await numbers.SortAndStore(list2, Order.Descending);
+
+      var list3 = _container.GetKey<RedisList<short>>("destlist3");
+      await numbers.PopPush(list3);
