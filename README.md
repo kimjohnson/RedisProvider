@@ -52,6 +52,9 @@ StackExchange.Redis dependency.
     key1.Persist()
     key1.TimeToLive()
     
+    // Access the StackExchange.Redis.Database to directly execute any commands not supported by the RedisProvider. Eg:
+    var randomeKey = container.Database.KeyRandom();
+    
     // The generic parameter for any type can be an IConvertible, byte[] or POCO/DTO. Examples:
     var longitem = container.GetKey<RedisItem<long>>("longitem");
     var intlist = container.GetKey<RedisList<int>("intlist");
