@@ -55,8 +55,6 @@ Uses asynchronous I/O exclusively.
     var customers = container.GetKey<RedisHash<string, Customer>>("customers");
     var cust1 = container.GetKey<RedisDtoHash<Customer>>("cust1");
     
-    
-    
 
 ## RedisItem 
 
@@ -79,7 +77,7 @@ Uses asynchronous I/O exclusively.
       await key2.Decrement();
       var n = await key2.Get();
 
-## RedisBitMap
+## RedisBitmap
 
       // Basic bit ops
       var bits = container.GetKey<RedisBitmap>("bits");
@@ -263,7 +261,7 @@ Uses asynchronous I/O exclusively.
       var cust1copy = await custKey.ToDto();
       
       //  
-      // 3 - As untyped hash table
+      // 3 - As untyped key-value pair hash
       // 
       var item1 = _container.GetKey<RedisValueHash>("key3");
 
@@ -274,3 +272,32 @@ Uses asynchronous I/O exclusively.
       await item1.Set("votes", 122);
 
       await foreach (var field in item1) Console.WriteLine($"{field.Key} = {field.Value}");
+      
+## Key creation
+
+      // Easiest- - ask the container.  If the container is tracking key creation and the key was already
+      // added to the container then that object is returned, otherwise a new object is created.
+      // This does not create the key in the Redis database.
+      
+      var itemkey1 = _container.GetKey<RedisItem<string>>("key1");
+
+      // Create a new object and add to the container.  This also does not create the key in the Redis database.
+      var itemkey2 = _container.AddToContainer(new RedisItem<string>("key2"));
+      await itemkey2.Set("world");
+
+      // Templated key creation with KeyTemplate<T>
+      // If using the common pattern of including the object ID in the key name, for example "user:1", "user:1234", 
+      // manually creating each key and ensuring both the data type and key name format are correct can be error prone.  
+      // The KeyTemplate<T> acts as a factory for keys of the specified type and key name pattern.
+      
+      var doccreator = _container.GetKeyTemplate<RedisItem<string>>("doc:{0}");
+      var doc1 = doccreator.GetKey(1);
+      await doc1.Set("first document is doc:1");
+
+      var doc2 = doccreator.GetKey(2);
+      await doc2.Set("second document is doc:2");
+
+      foreach (var k in _container.TrackedKeys) Console.WriteLine(k);
+      
+## Transactions and batches
+
