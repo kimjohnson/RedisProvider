@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+
+@using Twit.Shared
+@inject Services.AppState AppState
+
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        @if (AppState.IsLoggedIn) {
+            <span vertical-align="center">Welcome @AppState.User.UserName</span>
+            <a href="authentication/logout">Logout</a>
+        } else {
+            <a href="authentication/register">Register</a>
+            <a href="authentication/login">Log in</a>
+        }
+
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+</div>

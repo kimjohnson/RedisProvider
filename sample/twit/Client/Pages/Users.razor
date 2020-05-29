@@ -1,0 +1,40 @@
+﻿
+@using Twit.Shared
+@inject Services.AppState AppState
+@inject NavigationManager Mgr
+
+<h1>Who to follow</h1>
+@if (UserList == null) {
+    <p><em>Loading...</em></p>
+} else {
+    <table class="table" align="right">
+
+        <tbody>
+            @foreach (var user in UserList) {
+                <tr>
+                    <td width="80%"><a href="timeline/@user.UserName">@user.UserName</a></td>
+                    @if (AppState.IsLoggedIn) {
+                        <td><button @onclick="@(e => Follow(user.UserName))" class="btn btn-primary">Follow</button></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private IList<UserToFollow> UserList;
+
+    protected override async Task OnInitializedAsync() {
+        UserList = await AppState.GetUsers();
+    }
+
+
+    private async Task Follow(string userName) {
+        await AppState.Follow(userName);
+        Mgr.NavigateTo("/");
+    }
+
+
+}

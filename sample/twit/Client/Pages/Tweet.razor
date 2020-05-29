@@ -1,0 +1,27 @@
+﻿@page "/tweet"
+@inject Services.AppState AppState
+@inject NavigationManager Mgr
+
+<h3>What's happening?</h3>
+@if (!AppState.IsLoggedIn) {
+    <p>Login to tell the world what's happening.</p>
+}
+else { 
+<textarea placeholder="What's happening?" cols="60"  @bind="message" />
+<button @onclick="CreatePost" class="btn btn-primary">Tweet</button>
+}
+
+@code {
+  private string message;
+
+
+  private async Task CreatePost() {
+
+      if (!string.IsNullOrEmpty(message)) {
+          await AppState.CreatePost(message);
+      }
+
+      Mgr.NavigateTo("/");
+
+  }
+}

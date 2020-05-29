@@ -1,0 +1,55 @@
+﻿@page "/authentication/{action}"
+@using Twit.Shared
+@inject Services.AppState AppState
+@inject NavigationManager Mgr
+
+<h1>@HdrAction</h1>
+
+<p>Username</p>
+<input @bind="User.UserName" />
+<p></p>
+<p>Password</p>
+<input type="password" @bind="User.Password" />
+<button class="btn btn-primary" @onclick="Authenticate">@HdrAction</button>
+<p></p>
+<p>@message</p>
+
+
+@code {
+
+    [Parameter]
+    public string Action { get; set; }
+
+    private UserDto User { get; set; }
+    private string HdrAction;
+    private string message;
+
+
+    protected override void OnParametersSet() {
+        if (Action == "logout") {
+            AppState.Logout();
+            Mgr.NavigateTo("/");
+        }
+
+        if (Action.ToLower() == "register")
+            HdrAction = "Register";
+        else
+            HdrAction = "Login";
+
+        User = new UserDto();
+    }
+
+    private async void Authenticate() {
+
+        if (HdrAction == "Register")
+            await AppState.Register(User);
+        else
+            await AppState.Login(User);
+
+        if (AppState.IsLoggedIn)
+            Mgr.NavigateTo("/");
+
+        message = "Enter a valid user name and password.";
+        this.StateHasChanged();
+    }
+}
