@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twit.Client", "Client\Twit.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twit.Shared", "Shared\Twit.Shared.csproj", "{6CC98100-9505-45A7-AD26-1C8BC8F66BA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twit.Tests", "junk.Tests\Twit.Tests.csproj", "{15CE9046-370E-4D73-B062-2C76DB285B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twit.Tests", "Tests\Twit.Tests.csproj", "{15CE9046-370E-4D73-B062-2C76DB285B82}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisProvider", "..\..\src\RedisProvider\RedisProvider.csproj", "{D0CBE683-4172-4415-AD10-C47C5FFBD635}"
 EndProject
