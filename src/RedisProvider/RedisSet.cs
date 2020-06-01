@@ -80,7 +80,7 @@ namespace RedisProvider {
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public Task<IList<T>> Pop(int count = 1) {
+    public Task<IList<T>> Pop(long count = 1) {
       return Executor.SetPopAsync(KeyName, count)
         .ContinueWith<IList<T>>(r => r.Result.Select(v => ToElement<T>(v)).ToList(),
         TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -91,7 +91,7 @@ namespace RedisProvider {
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public Task<IList<T>> Peek(int count = 1) {
+    public Task<IList<T>> Peek(long count = 1) {
       return Executor.SetRandomMembersAsync(KeyName, count)
              .ContinueWith<IList<T>>(r => r.Result.Select(v => ToElement<T>(v)).ToList(),
               TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -115,7 +115,7 @@ namespace RedisProvider {
     /// <param name="take"></param>
     /// <param name="byKeyNamePattern"></param>
     /// <param name="getKeyNamePattern"></param>
-    public Task<IList<T>> Sort(Order order = Order.Ascending, SortType sortType = SortType.Numeric, int skip = 0, int take = -1, string byKeyNamePattern = null, string[] getKeyNamePattern = null) {
+    public Task<IList<T>> Sort(Order order = Order.Ascending, SortType sortType = SortType.Numeric, long skip = 0, long take = -1, string byKeyNamePattern = null, string[] getKeyNamePattern = null) {
       var getKeys = getKeyNamePattern == null ? null : getKeyNamePattern.Select(s => (RedisValue)s).ToArray();
       return Executor.SortAsync(KeyName, skip, take, order, sortType, byKeyNamePattern, getKeys)
              .ContinueWith<IList<T>>(r => r.Result.Select(v => ToElement<T>(v)).ToList(),
@@ -133,7 +133,7 @@ namespace RedisProvider {
     /// <param name="byKeyNamePattern"></param>
     /// <param name="getKeyNamePattern"></param>
     /// <returns></returns>
-    public Task<long> SortAndStore(RedisSet<T> destinationSet, Order order = Order.Ascending, SortType sortType = SortType.Numeric, int skip = 0, int take = -1, string byKeyNamePattern = null, string[] getKeyNamePattern = null) {
+    public Task<long> SortAndStore(RedisSet<T> destinationSet, Order order = Order.Ascending, SortType sortType = SortType.Numeric, long skip = 0, long take = -1, string byKeyNamePattern = null, string[] getKeyNamePattern = null) {
       var getKeys = getKeyNamePattern == null ? null : getKeyNamePattern.Select(s => (RedisValue)s).ToArray();
       return Executor.SortAndStoreAsync(destinationSet.KeyName, KeyName, skip, take, order, sortType, byKeyNamePattern, getKeys);
     }
